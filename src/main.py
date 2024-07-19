@@ -9,17 +9,22 @@ from utils.texture_match import flame_smplx_texture_combine
 
 
 
-smplx_obj = "../data/smplx-addon.obj"
-flame_obj = "../data/head_template.obj"
-smplx_2_flame = "../data/SMPL-X__FLAME_vertex_ids.npy"
-smplx_texture = "../data/smplx_texture_m_alb.png"
-flame_texture = "../data/swh_dongmi_white.png"
+def transform(filename):
+    smplx_obj = "../data/smplx-addon.obj"
+    flame_obj = "../data/head_template.obj"
+    smplx_2_flame = "../data/SMPL-X__FLAME_vertex_ids.npy"
+    smplx_texture = f"../data/input/smplx_{filename}"
+    flame_texture = f"../data/input/{filename}"
 
-# only face (not head)
-face_vertex_ids = "../data/face_vertex_ids.npy"
+    # only face (not head)
+    face_vertex_ids = "../data/face_vertex_ids.npy"
 
 
+    tex_output = flame_smplx_texture_combine(flame_obj,smplx_obj,flame_texture,smplx_texture,smplx_2_flame,None)
 
-tex_output = flame_smplx_texture_combine(flame_obj,smplx_obj,flame_texture,smplx_texture,smplx_2_flame,face_vertex_ids)
+    output_filename = 'converted_' + filename
+    cv2.imwrite(f'../data/output/{output_filename}',tex_output)
 
-cv2.imwrite('../data/output_texture.png',tex_output)
+transform('han_1.png')
+transform('han_2.png')
+transform('han_3.png')

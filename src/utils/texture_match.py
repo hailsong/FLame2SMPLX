@@ -22,13 +22,13 @@ def affine_transform(p1,p2,tex1,tex2):
     # crop tex1 by p1 --> tex2 by p2
     p1 = p1.reshape(-1,2).astype(np.float32) #[3,2]
     p2 = p2.reshape(-1,2).astype(np.float32) #[3,2]
-    mat_trans = cv2.getAffineTransform(p1, p2) 
+    mat_trans = cv2.getAffineTransform(p1, p2)
     p1 = p1.astype(np.int)
     p2 = p2.astype(np.int)
-    
+
     dst_h,dst_w,_ = tex2.shape
 
-    # 
+    #
     tex1_mask = np.zeros(tex1.shape,dtype=np.int8)
     tex2_mask = np.ones(tex2.shape,dtype=np.int8)
 
@@ -39,11 +39,11 @@ def affine_transform(p1,p2,tex1,tex2):
     invalid_index = np.where(tex1_mask==0)
     tex1[invalid_index] = 0
 
-    # 
+    #
     invalid_index2 = np.where(tex2_mask==0)
     tex2[invalid_index2] = 0
 
-    dst = cv2.warpAffine(tex1, mat_trans, (dst_w,dst_h)) 
+    dst = cv2.warpAffine(tex1, mat_trans, (dst_w,dst_h))
 
     # combine tex2 and dst image
     out_img = dst+tex2
@@ -93,10 +93,11 @@ def get_smplx_flame_crossrespondence_face_ids(smplx_template_obj,
     # smplx to flame vertex ids
     sf_ids = np.load(smplx_flame_vertex_ids)
 
-    
+
     if smplx_face_indexes is not None:
         # filtered other index but face vertices index
         face_vertex_ids = np.load(smplx_face_indexes)
+
         for j in range(f_verts.shape[0]):
             if sf_ids[j] in face_vertex_ids[0]:
                 continue
@@ -139,8 +140,10 @@ def flame_smplx_texture_combine(flame_obj,
     # 
     flame_texture = cv2.imread(flame_texture)
     smplx_texture = cv2.imread(smplx_texture)
-    flame_texture = cv2.resize(flame_texture,[2048,2048])
-    smplx_texture = cv2.resize(smplx_texture,[4096,4096])
+    # flame_texture = cv2.resize(flame_texture,[2048,2048])
+    # smplx_texture = cv2.resize(smplx_texture,[4096,4096])
+    flame_texture = cv2.resize(flame_texture,[512,512])
+    smplx_texture = cv2.resize(smplx_texture,[1024,1024])
     f_h,f_w,_ = flame_texture.shape
     s_h,s_w,_ = smplx_texture.shape
 
@@ -163,7 +166,7 @@ def flame_smplx_texture_combine(flame_obj,
         # print(flame_p.shape)
         smplx_texture = affine_transform(flame_p,smplx_p,flame_texture,smplx_texture)
         
-    smplx_texture = cv2.medianBlur(smplx_texture,17)
+    smplx_texture = cv2.medianBlur(smplx_texture,11)
 
     # cv2.imwrite('../data/flame2smplx.png',smplx_texture)
     return smplx_texture
